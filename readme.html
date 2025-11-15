@@ -1,0 +1,513 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+pre, code {
+  white-space: pre-wrap;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="datanorm-az">Datanorm-AZ</h1>
+<p><img src="https://img.shields.io/badge/Python-3.7+-blue"
+alt="Python" /> <img
+src="https://img.shields.io/badge/SQLite-3.x-lightgrey"
+alt="SQLite" /></p>
+<p>A cross-platform Python tool for parsing DATANORM files (record types
+A and Z), loading data into an in-memory database, and calculating sales
+prices with overhead and markup calculations.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Parse DATANORM format files (up to 2 million lines), consisting of
+records A and Z</li>
+<li>Create in-memory SQLite database, storing article data (type A) and
+graduated prices (type Z)</li>
+<li>Calculate derived price information:
+<ul>
+<li>List prices and purchase prices (with quantity-based graduated
+pricing support)</li>
+<li>Supplier discounts</li>
+<li>Calculated purchase prices with overhead</li>
+<li>Markup percentages</li>
+<li>Final sale prices (based on quantity if specified)</li>
+</ul></li>
+<li>Look up individual articles with all price steps</li>
+<li>Export calculated prices to CSV</li>
+<li>Display output with SQL-style formatting</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p>Requires Python 3.7+ only. All required modules are part of the
+standard library:</p>
+<ul>
+<li><code>argparse</code> - command-line argument parsing</li>
+<li><code>csv</code> - CSV file handling</li>
+<li><code>json</code> - JSON serialization</li>
+<li><code>sqlite3</code> - in-memory database</li>
+<li><code>pathlib</code> - path handling</li>
+<li><code>dataclasses</code> - data classes</li>
+<li><code>typing</code> - type hints</li>
+<li><code>__future__</code> - future features</li>
+</ul>
+<p>No external dependencies or installation required.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The input DATANORM file can be specified in <code>config.py</code>.
+Default setup:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>datafile <span class="op">=</span> <span class="st">&quot;docs/task_description/DATANORM.001&quot;</span></span></code></pre></div>
+<h2 id="usage">Usage</h2>
+<h3 id="basic-usage">Basic Usage</h3>
+<p>Process input DATANORM file and display both article information and
+calculated prices for the first article:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py</span></code></pre></div>
+<p>Output:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;article&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                   <span class="dt">&quot;article_no&quot;</span><span class="fu">:</span> <span class="st">&quot;2AIRDB&quot;</span><span class="fu">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                         <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;AIRSTOP SD18 Dampfbremse 1,50 x 50 m&quot;</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                         <span class="dt">&quot;unit&quot;</span><span class="fu">:</span> <span class="st">&quot;MTK&quot;</span><span class="fu">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                   <span class="dt">&quot;list_price&quot;</span><span class="fu">:</span> <span class="fl">231.0</span><span class="fu">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>               <span class="dt">&quot;purchase_price&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>          <span class="dt">&quot;availability_status&quot;</span><span class="fu">:</span> <span class="st">&quot;Article found, stock level unknown&quot;</span><span class="fu">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                  <span class="dt">&quot;price_steps&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="er">...</span><span class="ot">]</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>   <span class="dt">&quot;prices&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                   <span class="dt">&quot;article_no&quot;</span><span class="fu">:</span> <span class="st">&quot;2AIRDB&quot;</span><span class="fu">,</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                         <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;AIRSTOP SD18 Dampfbremse 1,50 x 50 m&quot;</span><span class="fu">,</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                         <span class="dt">&quot;unit&quot;</span><span class="fu">:</span> <span class="st">&quot;MTK&quot;</span><span class="fu">,</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                   <span class="dt">&quot;list_price&quot;</span><span class="fu">:</span> <span class="fl">231.0</span><span class="fu">,</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;supplier_discount_pct&quot;</span><span class="fu">:</span> <span class="fl">29.87</span><span class="fu">,</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>               <span class="dt">&quot;purchase_price&quot;</span><span class="fu">:</span> <span class="fl">162.0</span><span class="fu">,</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                 <span class="dt">&quot;overhead_pct&quot;</span><span class="fu">:</span> <span class="fl">0.0</span><span class="fu">,</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;calculated_purchase_price&quot;</span><span class="fu">:</span> <span class="fl">162.0</span><span class="fu">,</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                   <span class="dt">&quot;markup_pct&quot;</span><span class="fu">:</span> <span class="fl">42.59</span><span class="fu">,</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                   <span class="dt">&quot;sale_price&quot;</span><span class="fu">:</span> <span class="fl">231.0</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Where:</p>
+<ul>
+<li><code>supplier_discount_pct</code> =
+<code>(1 - purchase_price / list_price) * 100</code></li>
+<li><code>calculated_purchase_price</code> =
+<code>purchase_price * (1 + overhead_pct / 100)</code></li>
+<li><code>markup_pct</code> =
+<code>(sale_price / calculated_purchase_price - 1) * 100</code></li>
+<li><code>sale_price</code> = <code>list_price</code> or
+<code>calculated_purchase_price</code> (whichever is available)</li>
+<li>Prices are selected from graduated price steps based on quantity
+(default quantity = 1)</li>
+<li>All calculated prices and percentages are rounded to the number of
+decimal digits specified in <code>config.py</code>
+(<code>ROUND_TO_DEC_DIGIT</code>, default: 2)</li>
+</ul>
+<h3 id="lookup-specific-article">Lookup Specific Article</h3>
+<p>Get detailed information about a single article (raw data without
+price calculations):</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--article</span> 2TOP</span></code></pre></div>
+<p>The command returns JSON with article details and all associated
+price steps (raw data from database, no calculated fields).</p>
+<h3 id="get-calculated-prices-for-specific-article">Get Calculated
+Prices for Specific Article</h3>
+<p>Get calculated prices for a single article. Prices are calculated
+based on graduated price steps. Use <code>--qnt</code> to specify
+quantity for quantity-based pricing (default quantity = 1):</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--prices</span> 2TOP</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--prices</span> 2TOP <span class="at">--qnt</span> 100  <span class="co"># Calculate prices for quantity 100</span></span></code></pre></div>
+<p>The command returns JSON array with calculated price fields. Prices
+are selected from graduated price steps based on the specified quantity
+(or quantity = 1 by default).</p>
+<p><strong>Note:</strong> When <code>--qnt</code> is specified, the
+output includes both unit prices (per item) and total prices (unit price
+× quantity). When <code>--qnt</code> is not specified, only unit prices
+are returned.</p>
+<h3 id="limit-output">Limit Output</h3>
+<p>Display first N articles (default is 1). Use the <code>--limit</code>
+option with <code>{None|all}</code> for unlimited:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> 10</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> {None<span class="kw">|</span><span class="ex">all}</span>  <span class="co"># Show all articles</span></span></code></pre></div>
+<h3 id="overhead-percentage">Overhead Percentage</h3>
+<p>Apply overhead percentage to purchase prices:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--overhead</span> 10.0</span></code></pre></div>
+<h3 id="export-to-csv">Export to CSV</h3>
+<p>Export calculated prices to a CSV file:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv                 <span class="co"># Export calculated prices for first article (default limit=1)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--limit</span> all     <span class="co"># Export calculated prices for all articles</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--limit</span> 10      <span class="co"># Export calculated prices for first 10 articles</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--article</span> 2TOP  <span class="co"># Export calculated prices for specific article (quantity = 1)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--article</span> 2TOP <span class="at">--qnt</span> 100  <span class="co"># Export calculated prices for specific article with quantity-based pricing (includes total prices)</span></span></code></pre></div>
+<h3 id="custom-datanorm-file">Custom DATANORM File</h3>
+<p>Process a different DATANORM file:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py path/to/file.dat</span></code></pre></div>
+<p><strong>Note:</strong> Only record types A (articles) and Z
+(graduated prices) are processed. All other record types are
+ignored.</p>
+<p><strong>File Encoding Support:</strong></p>
+<p>The processor supports various text encodings for DATANORM files:</p>
+<ul>
+<li><strong>Default</strong>: <code>latin-1</code> (ISO-8859-1)</li>
+<li><strong>UTF-8</strong>: For files with Unicode characters (e.g.,
+Russian, German umlauts)</li>
+<li><strong>Windows-1251</strong>: For Cyrillic characters (Russian,
+Bulgarian, etc.)</li>
+<li><strong>Other encodings</strong>: Any encoding supported by Python’s
+<code>open()</code> function</li>
+</ul>
+<p>Default encodings can be configured in <code>config.py</code>:
+<code>default_input_encoding</code> for DATANORM files and
+<code>default_output_encoding</code> for CSV export.</p>
+<p>Rounding precision for calculated prices and percentages can be
+configured in <code>config.py</code>: <code>ROUND_TO_DEC_DIGIT</code>
+(default: 2 decimal digits).</p>
+<h2 id="limitations">Limitations</h2>
+<p>The following features are <strong>not currently
+supported</strong>:</p>
+<ul>
+<li><strong>Multiple articles with different quantities in a single
+request</strong>: You can specify only one article number
+(<code>--article</code> or <code>--prices</code>) and one quantity
+(<code>--qnt</code>) per command. To process multiple articles with
+different quantities, you need to run separate commands for each
+article-quantity combination.</li>
+</ul>
+<h2 id="project-structure">Project Structure</h2>
+<pre><code>.
+├── config.py               # Configuration settings
+├── datanorm_parser.py      # CLI argument parser
+├── datanorm_processor.py   # Core processing logic
+├── json_formatter.py       # JSON formatting utilities
+├── main.py                 # Main entry point
+│
+├── docs/                   # Documentation
+│   │
+│   ├── cli_main_py/        # CLI main module documentation
+│   │   ├── cli_logic.md    # CLI logic documentation with diagram and description
+│   │   ├── cli_logic_chart.mmd  # CLI logic decision flowchart (Mermaid source)
+│   │   └── cli_logic_chart.svg  # CLI logic decision flowchart (SVG)
+│   │
+│   ├── data_structure/     # Data structure documentation
+│   │   │
+│   │   ├── de/             # German documentation
+│   │   │   ├── calculated_prices.md/html  # Output structure
+│   │   │   ├── price_steps.md/html        # Price steps structure
+│   │   │   ├── record_a.md/html           # Record type A
+│   │   │   └── record_z.md/html           # Record type Z
+│   │   │
+│   │   ├── en/             # English documentation
+│   │   │   ├── calculated_prices.md/html  # Output structure
+│   │   │   ├── price_steps.md/html        # Price steps structure
+│   │   │   ├── record_a.md/html           # Record type A
+│   │   │   └── record_z.md/html           # Record type Z
+│   │   │
+│   │   └── ru/             # Russian documentation
+│   │       ├── calculated_prices.md/html  # Output structure
+│   │       ├── price_steps.md/html        # Price steps structure
+│   │       ├── record_a.md/html           # Record type A
+│   │       └── record_z.md/html           # Record type Z
+│   │
+│   └── task_description/   # Task files and test data
+│       │
+│       ├── DATANORM.001    # Test DATANORM file
+│       │
+│       ├── de/             # German documentation
+│       │   ├── task.md/html        # Task description
+│       │   └── answers.md/html     # Answers to questions
+│       │
+│       ├── en/             # English documentation
+│       │   ├── task.md/html        # Task description
+│       │   └── answers.md/html     # Answers to questions
+│       │
+│       └── ru/             # Russian documentation
+│           ├── task.md/html        # Task description
+│           └── answers.md/html     # Answers to questions
+│
+├── tools/                  # Utility tools
+│   ├── extract_mmd.py      # Mermaid diagram extractor
+│   ├── html_mmd2svg.py     # Replace Mermaid blocks with SVG images in HTML
+│   ├── md2html.py          # Markdown to HTML converter
+│   └── mmd2svg.py          # Mermaid diagram to SVG converter
+│
+└── untst/                  # Unit tests
+    ├── test_datanorm_parser.py     # Tests for datanorm_parser
+    ├── test_datanorm_processor.py  # Tests for datanorm_processor
+    ├── test_extract_mmd.py         # Tests for extract_mmd tool
+    ├── test_html_mmd2svg.py        # Tests for html_mmd2svg tool
+    ├── test_main.py                # Tests for main module
+    ├── test_md2html.py             # Tests for md2html tool
+    └── test_mmd2svg.py             # Tests for mmd2svg tool</code></pre>
+<h2 id="datanorm-format">DATANORM Format</h2>
+<p>The processor handles DATANORM format files with:</p>
+<ul>
+<li><strong>Record type A</strong>: <a
+href="docs/data_structure/en/record_a.html">Article master data</a>
+(product information, prices)</li>
+<li><strong>Record type Z</strong>: <a
+href="docs/data_structure/en/record_z.html">Graduated prices</a>
+(quantity-based pricing steps)</li>
+</ul>
+<p>See <code>docs/data_structure/</code> for detailed field
+documentation (available in German, Russian, and English):</p>
+<ul>
+<li><a href="docs/data_structure/en/calculated_prices.html">Calculated
+prices output structure</a> - Structure of
+<code>calculate_prices()</code> output</li>
+<li><a href="docs/data_structure/en/price_steps.html">Price steps
+structure</a> - Structure of price steps returned by
+<code>lookup_article()</code></li>
+</ul>
+<h2 id="algorithm">Algorithm</h2>
+<p>The processor follows a streaming approach to efficiently handle
+large DATANORM files:</p>
+<ol type="1">
+<li><strong>Database Initialization</strong>: Create an in-memory SQLite
+database with <code>articles</code> and <code>price_steps</code>
+tables</li>
+<li><strong>File Parsing</strong>: Read DATANORM file line by line,
+identify record types (A for articles, Z for price steps), and parse
+semicolon-separated fields</li>
+<li><strong>Data Storage</strong>: Use upsert operations (INSERT … ON
+CONFLICT DO UPDATE) to store/update records</li>
+<li><strong>Price Calculation</strong>: Calculate derived prices using
+base prices, quantity-based pricing, overhead, discounts, and
+markup</li>
+<li><strong>Output Generation</strong>: Format as JSON (default) or
+export to CSV (output folder is created automatically if needed)</li>
+</ol>
+<h3 id="price-calculation-details-and-edge-cases">Price Calculation
+Details and Edge Cases</h3>
+<h4 id="price-resolution-priority">Price Resolution Priority</h4>
+<p>When prices are available from multiple sources, the following
+priority is used:</p>
+<ol type="1">
+<li><strong>Quantity-specific price from price steps</strong> (if
+quantity is specified and matches a price step range)</li>
+<li><strong>Price from article record (type A)</strong> (if
+available)</li>
+<li><strong>First price from price steps</strong> (lowest quantity
+range, as fallback)</li>
+</ol>
+<p><strong>Example:</strong> If an article has: - List price in article
+record (A): 100.0 - Price step (Z) for quantity 50-99: 90.0 - Price step
+(Z) for quantity 100+: 80.0</p>
+<p>Then:</p>
+<ul>
+<li><code>--qnt 75</code> → uses 90.0 (from price step matching quantity
+range)</li>
+<li><code>--qnt 1</code> → uses 100.0 (from article record, no matching
+price step)</li>
+<li>If article record had no price → would use 90.0 (first price
+step)</li>
+</ul>
+<h4 id="missing-prices">Missing Prices</h4>
+<p><strong>When list price is missing:</strong></p>
+<ul>
+<li>Falls back to price steps (if available)</li>
+<li>If still missing, <code>sale_price</code> uses
+<code>calculated_purchase_price</code> instead</li>
+<li><code>supplier_discount_pct</code> is <code>null</code> (cannot
+calculate without both prices)</li>
+</ul>
+<p><strong>When purchase price is missing:</strong></p>
+<ul>
+<li>Falls back to price steps (if available)</li>
+<li>If still missing, <code>calculated_purchase_price</code> is
+<code>null</code></li>
+<li><code>markup_pct</code> is <code>null</code> (cannot calculate
+without <code>calculated_purchase_price</code>)</li>
+<li><code>sale_price</code> uses <code>list_price</code> if
+available</li>
+</ul>
+<p><strong>Example with missing purchase price:</strong></p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;list_price&quot;</span><span class="fu">:</span> <span class="fl">894.0</span><span class="fu">,</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;purchase_price&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;supplier_discount_pct&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;calculated_purchase_price&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sale_price&quot;</span><span class="fu">:</span> <span class="fl">894.0</span><span class="fu">,</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;markup_pct&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h4 id="quantity-based-pricing">Quantity-Based Pricing</h4>
+<p>Price steps are selected based on the quantity falling within the
+<code>min_quantity</code> and <code>max_quantity</code> range:</p>
+<ul>
+<li>If quantity matches a range → use that price step’s value</li>
+<li>If quantity is below all ranges → use first (lowest) price step</li>
+<li>If quantity is above all ranges → use last (highest) price step</li>
+<li>If no price steps exist → use price from article record</li>
+</ul>
+<p><strong>Example:</strong> Article has price steps: - Quantity 1-49:
+100.0 - Quantity 50-99: 90.0 - Quantity 100+: 80.0</p>
+<p>Results:</p>
+<ul>
+<li><code>--qnt 25</code> → 100.0 (within 1-49 range) - unit price</li>
+<li><code>--qnt 75</code> → 90.0 (within 50-99 range) - unit price</li>
+<li><code>--qnt 150</code> → 80.0 (within 100+ range) - unit price</li>
+<li><code>--qnt 0.5</code> → 100.0 (below all ranges, uses first step) -
+unit price</li>
+</ul>
+<p><strong>Total Prices:</strong> When <code>--qnt</code> is specified,
+the output includes both unit prices (per item) and total prices (unit
+price × quantity). For example, with <code>--qnt 200</code> and unit
+price 162.0, the output will include: -
+<code>purchase_price: 162.0</code> (unit price per item) -
+<code>total_purchase_price: 32400.0</code> (162.0 × 200, total for 200
+items)</p>
+<p>This follows standard e-commerce practice of displaying both unit and
+total prices for transparency.</p>
+<h4 id="overhead-impact">Overhead Impact</h4>
+<p>Overhead percentage is applied to purchase price to calculate
+<code>calculated_purchase_price</code>:</p>
+<pre><code>calculated_purchase_price = purchase_price × (1 + overhead_percent / 100)</code></pre>
+<p><strong>Example:</strong> Purchase price = 626.0, overhead = 10%</p>
+<ul>
+<li><code>calculated_purchase_price</code> = 626.0 × 1.10 = 688.6</li>
+<li>If <code>sale_price</code> = 894.0 (list price), then
+<code>markup_pct</code> = (894.0 / 688.6 - 1) × 100 = 29.83</li>
+</ul>
+<p><strong>Note:</strong> Overhead only affects
+<code>calculated_purchase_price</code> and <code>markup_pct</code>. It
+does not change <code>list_price</code> or <code>purchase_price</code>
+values.</p>
+<p>For detailed CLI logic and decision flow diagram, see <a
+href="docs/cli_main_py/cli_logic.html">CLI Logic Documentation</a>
+(Mermaid diagram, also available as <a
+href="docs/cli_main_py/cli_logic_chart.svg">SVG</a>).</p>
+<h2 id="tools">Tools</h2>
+<h3 id="mermaid-diagram-extractor">Mermaid Diagram Extractor</h3>
+<p>The <code>tools/extract_mmd.py</code> module extracts Mermaid diagram
+blocks from Markdown files and saves them as <code>.mmd</code> files. If
+multiple Mermaid blocks are found, extracts all of them to separate
+numbered files (e.g., <code>output.mmd</code>,
+<code>output-2.mmd</code>, <code>output-3.mmd</code>). Optionally, it
+can automatically convert to SVG.</p>
+<p><strong>Usage:</strong></p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract mermaid diagram(s) (MMD will be generated in the same folder)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.extract_mmd file.md</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract with explicit output path (if multiple blocks, uses numbered suffixes)</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.extract_mmd file.md <span class="at">--mmd</span> output.mmd</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and automatically convert to SVG (all blocks if multiple found)</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.extract_mmd file.md <span class="at">--svg</span> output.svg</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and convert to SVG with custom background</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.extract_mmd file.md <span class="at">--svg</span> output.svg <span class="at">--background</span> white</span></code></pre></div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>None for extracting to MMD format (pure Python, uses standard
+library only)</li>
+<li>Mermaid CLI (mmdc) if <code>--svg</code> option is used: Install
+with <code>npm install -g @mermaid-js/mermaid-cli</code></li>
+</ul>
+<h3 id="mermaid-block-to-svg-image-replacer">Mermaid Block to SVG Image
+Replacer</h3>
+<p>The <code>tools/html_mmd2svg.py</code> module post-processes HTML
+files to replace Mermaid diagram code blocks with
+<code>&lt;img&gt;</code> tags pointing to corresponding SVG files. This
+is useful after converting Markdown to HTML to display rendered diagrams
+instead of code blocks.</p>
+<p><strong>Usage:</strong></p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Process HTML file (auto-detects SVG: {filename}_chart.svg or {filename}.svg)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.html_mmd2svg file.html</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Process with explicit SVG path</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.html_mmd2svg file.html <span class="at">--svg</span> diagram.svg</span></code></pre></div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>None (pure Python, uses standard library only)</li>
+</ul>
+<p><strong>Example workflow:</strong></p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract Mermaid diagram from Markdown</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.extract_mmd docs/cli_main_py/cli_logic.md <span class="at">--svg</span> docs/cli_main_py/cli_logic_chart.svg</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Convert Markdown to HTML</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.md2html docs/cli_main_py/cli_logic.md</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Replace Mermaid code block with SVG image</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.html_mmd2svg docs/cli_main_py/cli_logic.html</span></code></pre></div>
+<h3 id="markdown-to-html-converter">Markdown to HTML Converter</h3>
+<p>The <code>tools/md2html.py</code> module converts Markdown files to
+HTML with optional CSS style injection. It supports two conversion
+backends: pandoc (preferred) or node.js with marked library.</p>
+<p><strong>Usage:</strong></p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert a Markdown file (HTML will be generated in the same folder)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.md2html file.md</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert with explicit output path</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.md2html file.md <span class="at">--html</span> output.html</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Use specific converter</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.md2html file.md <span class="at">--converter</span> pandoc</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.md2html file.md <span class="at">--converter</span> node</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add custom CSS style</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.md2html file.md <span class="at">--style</span> custom.css</span></code></pre></div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>pandoc (https://pandoc.org/installing.html) OR</li>
+<li>node.js (https://nodejs.org/) with npx (marked will be installed
+automatically)</li>
+<li>chardet (optional, recommended): For better encoding detection and
+warnings
+<ul>
+<li>Install with: <code>pip install chardet</code></li>
+<li>If not available, the module will use a simpler encoding check</li>
+</ul></li>
+</ul>
+<h3 id="mermaid-diagram-to-svg-converter">Mermaid Diagram to SVG
+Converter</h3>
+<p>The <code>tools/mmd2svg.py</code> module converts Mermaid diagram
+files (<code>.mmd</code>) to SVG format using Mermaid CLI.</p>
+<p><strong>Usage:</strong></p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert Mermaid diagram (SVG will be generated in the same folder)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.mmd2svg file.mmd</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert with explicit output path</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.mmd2svg file.mmd <span class="at">--svg</span> output.svg</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify background color</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> tools.mmd2svg file.mmd <span class="at">--background</span> transparent</span></code></pre></div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Mermaid CLI (mmdc): Install with
+<code>npm install -g @mermaid-js/mermaid-cli</code></li>
+</ul>
+<h2 id="testing">Testing</h2>
+<p>Unit tests are available in the <code>untst/</code> folder,
+covering:</p>
+<ul>
+<li>datanorm_processor.py</li>
+<li>datanorm_parser.py</li>
+<li>main.py</li>
+<li>md2html.py</li>
+<li>extract_mmd.py</li>
+<li>mmd2svg.py</li>
+<li>html_mmd2svg.py</li>
+</ul>
+<p>Run tests with:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> unittest discover untst <span class="at">-v</span></span></code></pre></div>
+<h2 id="license">License</h2>
+<p>Copyright (c) 2025 Daniil Korovinskiy</p>

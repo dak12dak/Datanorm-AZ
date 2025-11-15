@@ -1,0 +1,13 @@
+{
+  // Configure Python language server (Pylance can coexist with Anysphere)
+  // Pylance will still work, but Anysphere features will also be available
+  "python.languageServer": "Pylance",
+  
+  // Suppress extension recommendations notifications
+  "extensions.ignoreRecommendations": false,
+  
+  // Allow both Pylance and Anysphere to work together
+  // The notification is just a warning - you can dismiss it
+  "python.analysis.typeCheckingMode": "basic"
+}
+

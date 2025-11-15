@@ -1,0 +1,58 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="task-description-english">Task Description (English)</h1>
+<h2 id="reading-the-following-text-file">Reading the following text
+file:</h2>
+<ul>
+<li><strong>Specifications</strong>: Text file may contain up to 2
+million lines
+<ul>
+<li>Read into in-memory database</li>
+<li>Calculate sale price</li>
+<li>Check if article is available using article number</li>
+</ul></li>
+</ul>
+<h3 id="record-type-a-article">Record type A (Article)</h3>
+<ul>
+<li><strong>Field 3</strong> = Article number</li>
+<li><strong>Field 4</strong> = Article description</li>
+<li><strong>Field 7</strong> = 1 = List price value, 2 = Purchase price,
+9 = List price
+<ul>
+<li>⚠ Is the price in field 9 the list price or the purchase price?</li>
+</ul></li>
+<li><strong>Field 9</strong> = Price</li>
+</ul>
+<h3 id="record-type-z-graduated-price">Record type Z (Graduated
+price)</h3>
+<ul>
+<li><strong>Field 3</strong> = Article number</li>
+<li><strong>Field 8</strong> = 1 = Graduated price, 2 =
+Surcharge/discount amount, 3 = Percentage surcharge/discount</li>
+<li><strong>Field 9</strong> = + = Surcharge, - = Discount</li>
+<li><strong>Field 10</strong> = 1 = List price, 2 = Purchase price
+<ul>
+<li>⚠ Is the price/percentage in field 8 the list price or the purchase
+price?</li>
+</ul></li>
+</ul>
+<h3 id="article-table-structure">Article table structure</h3>
+<p><strong>Columns:</strong> - Article number - Article description -
+List price - Supplier discount (percent) - Purchase price - Overhead
+(percent) - Calculated purchase price - Markup (percent) - Sale
+price</p>

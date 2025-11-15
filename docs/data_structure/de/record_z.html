@@ -1,0 +1,162 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<table>
+<colgroup>
+<col style="width: 4%" />
+<col style="width: 16%" />
+<col style="width: 32%" />
+<col style="width: 15%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feld-Nr.</th>
+<th>Bezeichnung</th>
+<th>Bedeutung/Funktion</th>
+<th>Beispiel</th>
+<th>Hinweis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Satztyp</td>
+<td>Kennzeichen <code>Z</code> für Staffel-/Konditionssatz</td>
+<td><code>Z</code></td>
+<td>Immer <code>Z</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Satzstatus</td>
+<td>Aktionsflag</td>
+<td><code>N</code></td>
+<td>Häufig <code>N</code> = neu</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Artikelnummer</td>
+<td>Verweis auf Artikel (Feld 3 aus Datensatz <code>A</code>)</td>
+<td><code>2TOP</code></td>
+<td>Verknüpfung mit Artikeldaten</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Staffelcode</td>
+<td>Identifikator der Preisstufe</td>
+<td><code>01</code></td>
+<td>Laufende Nummer</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Konditionsnummer</td>
+<td>Oft fix (<code>1</code>)</td>
+<td><code>1</code></td>
+<td>Laut Spezifikation zu prüfen</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Kurzbeschreibung der Stufe</td>
+<td>Bezeichnung des Mengenintervalls</td>
+<td><code>Staffelpr. 45 bis 899</code></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Langbeschreibung der Stufe</td>
+<td>Ergänzung zu Feld 6</td>
+<td><code>Staffelpr. 45 bis 899</code></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td>Werttyp</td>
+<td><code>1</code> = Staffelpreis, <code>2</code> = Zuschlag/Abschlag
+absolut, <code>3</code> = Prozent</td>
+<td><code>1</code></td>
+<td>Im Beispiel immer <code>1</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Vorzeichen</td>
+<td><code>+</code> = Zuschlag, <code>-</code> = Abschlag</td>
+<td><code>+</code></td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Preisbasis</td>
+<td><code>1</code> = Listenpreis, <code>2</code> = Einkaufspreis</td>
+<td><code>2</code></td>
+<td>Bestimmt die Bezugsbasis</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Mengeneinheit Bedingung</td>
+<td>Häufig <code>1</code> (Stück)</td>
+<td><code>1</code></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Wert</td>
+<td>Preis/Summe/Prozent gemäß Feld 8</td>
+<td><code>626</code></td>
+<td>Bei Typ 1 = Endpreis in Währung</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Reserviert</td>
+<td>Im Beispiel leer</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Mengeneinheit Staffel</td>
+<td>Einheit des Mengenbereichs</td>
+<td><code>1</code></td>
+<td></td>
+</tr>
+<tr>
+<td>15</td>
+<td>Mindestmenge</td>
+<td>Untere Grenze</td>
+<td><code>45</code></td>
+<td></td>
+</tr>
+<tr>
+<td>16</td>
+<td>Maximalmenge</td>
+<td>Obere Grenze</td>
+<td><code>899</code></td>
+<td>Große Werte ≈ „unbegrenzt nach oben“</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Reserviert/leer</td>
+<td>Im Beispiel nicht belegt</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Hinweis: Die Zuordnung basiert auf <code>DATANORM.001</code>. Für
+verbindliche Bedeutungen (z. B. Felder 5 und 11) ist die offizielle
+DATANORM-Dokumentation maßgeblich.</p>
+</blockquote>

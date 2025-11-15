@@ -1,0 +1,52 @@
+flowchart TD
+    Start([Start: Parse Arguments]) --> CommonOptions[Common Options:<br/>--overhead default=0<br/>--qnt default=1<br/>applied to all<br/>price calculations]
+    CommonOptions --> CheckExport{--export<br/>specified?}
+    
+    CheckExport -->|Yes| ExportBranch[Export Mode]
+    CheckExport -->|No| CheckArticle{--article<br/>specified?}
+    
+    ExportBranch --> CheckArticleInExport{--article<br/>specified?}
+    CheckArticleInExport -->|Yes| ExportArticle[Export specific article<br/>article_no = args.article<br/>+ overhead, qnt]
+    CheckArticleInExport -->|No| CheckPricesInExport{--prices<br/>specified?}
+    CheckPricesInExport -->|Yes| ExportPrices[Export specific article<br/>article_no = args.prices<br/>+ overhead, qnt]
+    CheckPricesInExport -->|No| CheckLimitInExport{--limit<br/>specified?}
+    CheckLimitInExport -->|Yes| ExportLimit[Export with limit<br/>= args.limit<br/>+ overhead, qnt]
+    CheckLimitInExport -->|No| ExportLimitDefault[Export with limit<br/>= 1 default<br/>+ overhead, qnt]
+    ExportArticle --> ExportDone[Print: Exported results<br/>CSV created even if<br/>article not found]
+    ExportPrices --> ExportDone
+    ExportLimit --> ExportDone
+    ExportLimitDefault --> ExportDone
+    ExportDone --> End([End])
+    
+    CheckArticle -->|Yes| LookupArticle[Lookup Article Mode<br/>Return raw article data<br/>no price calculations]
+    CheckArticle -->|No| CheckPrices{--prices<br/>specified?}
+    
+    LookupArticle --> CheckArticleFound{Article<br/>found?}
+    CheckArticleFound -->|No| ErrorArticle[SystemExit:<br/>Article not found]
+    CheckArticleFound -->|Yes| PrintArticle[Print JSON:<br/>article data]
+    ErrorArticle --> End
+    PrintArticle --> End
+    
+    CheckPrices -->|Yes| LookupPrices[Prices Lookup Mode<br/>Calculate prices<br/>for article<br/>+ overhead, qnt]
+    CheckPrices -->|No| CheckLimit{--limit<br/>specified?}
+    
+    LookupPrices --> CheckPricesFound{Prices<br/>found?}
+    CheckPricesFound -->|No| ErrorPrices[SystemExit:<br/>Article not found]
+    CheckPricesFound -->|Yes| PrintPrices[Print JSON:<br/>calculated prices]
+    ErrorPrices --> End
+    PrintPrices --> End
+    
+    CheckLimit -->|No| DefaultMode[Default Mode<br/>+ overhead, qnt]
+    CheckLimit -->|Yes| ListMode[List Mode<br/>Multiple articles<br/>with calculated prices<br/>+ overhead, qnt]
+    
+    DefaultMode --> CheckFirstArticle{First article<br/>exists?}
+    CheckFirstArticle -->|No| PrintEmpty["Print: empty array"]
+    CheckFirstArticle -->|Yes| PrintFirstArticle["Print JSON:<br/>article + prices[0]"]
+    PrintEmpty --> End
+    PrintFirstArticle --> End
+    
+    ListMode --> PrintList[Print JSON:<br/>prices array<br/>limit = args.limit]
+    PrintList --> End
+    
+    classDef defaultMode fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    class DefaultMode defaultMode

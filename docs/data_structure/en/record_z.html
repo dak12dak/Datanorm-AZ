@@ -1,0 +1,162 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<table>
+<colgroup>
+<col style="width: 4%" />
+<col style="width: 16%" />
+<col style="width: 32%" />
+<col style="width: 15%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field No.</th>
+<th>Name</th>
+<th>Meaning/Function</th>
+<th>Example</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Record type</td>
+<td>Identifier <code>Z</code> for graduated/condition record</td>
+<td><code>Z</code></td>
+<td>Always <code>Z</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Record status</td>
+<td>Action flag</td>
+<td><code>N</code></td>
+<td>Often <code>N</code> = new</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Article number</td>
+<td>Reference to article (Field 3 from record <code>A</code>)</td>
+<td><code>2TOP</code></td>
+<td>Link to article data</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Step code</td>
+<td>Price step identifier</td>
+<td><code>01</code></td>
+<td>Sequential number</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Condition number</td>
+<td>Often fixed (<code>1</code>)</td>
+<td><code>1</code></td>
+<td>To be verified according to specification</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Short description of step</td>
+<td>Quantity interval description</td>
+<td><code>Staffelpr. 45 bis 899</code></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Long description of step</td>
+<td>Supplement to field 6</td>
+<td><code>Staffelpr. 45 bis 899</code></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td>Value type</td>
+<td><code>1</code> = Graduated price, <code>2</code> =
+Surcharge/discount absolute, <code>3</code> = Percent</td>
+<td><code>1</code></td>
+<td>In example always <code>1</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Sign</td>
+<td><code>+</code> = Surcharge, <code>-</code> = Discount</td>
+<td><code>+</code></td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Price base</td>
+<td><code>1</code> = List price, <code>2</code> = Purchase price</td>
+<td><code>2</code></td>
+<td>Determines the reference base</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Unit of measure condition</td>
+<td>Often <code>1</code> (piece)</td>
+<td><code>1</code></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Value</td>
+<td>Price/sum/percent according to field 8</td>
+<td><code>626</code></td>
+<td>For type 1 = final price in currency</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Reserved</td>
+<td>Empty in example</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Unit of measure step</td>
+<td>Unit of quantity range</td>
+<td><code>1</code></td>
+<td></td>
+</tr>
+<tr>
+<td>15</td>
+<td>Minimum quantity</td>
+<td>Lower limit</td>
+<td><code>45</code></td>
+<td></td>
+</tr>
+<tr>
+<td>16</td>
+<td>Maximum quantity</td>
+<td>Upper limit</td>
+<td><code>899</code></td>
+<td>Large values ≈ “unlimited upward”</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Reserved/empty</td>
+<td>Not used in example</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Note: The mapping is based on <code>DATANORM.001</code>. For binding
+meanings (e.g. fields 5 and 11), the official DATANORM documentation is
+authoritative.</p>
+</blockquote>

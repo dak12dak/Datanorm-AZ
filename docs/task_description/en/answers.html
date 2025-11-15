@@ -1,0 +1,55 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="answers-to-questions">Answers to Questions</h1>
+<h2 id="question-1-record-type-a-article">Question 1: Record type A
+(Article)</h2>
+<p><strong>Question:</strong> Is the price in field 9 the list price or
+the purchase price?</p>
+<p><strong>Answer:</strong> It depends on field 7 (Price type code): -
+If field 7 = 1 or 9 → field 9 contains <strong>list price</strong> - If
+field 7 = 2 → field 9 contains <strong>purchase price</strong></p>
+<p>Field 7 values: - <code>1</code> = List price (прейскурантная) -
+<code>2</code> = Purchase price (закупочная) - <code>9</code> =
+Alternative price (альтернативная)</p>
+<p><strong>Note:</strong> Since the specification does not clearly
+define what “alternative price” (value 9) means, we treat it as
+<strong>list price</strong> in our implementation.</p>
+<p>The interpretation is implemented in the code as follows: - When
+<code>price_type</code> (field 7) is <code>1</code> or <code>9</code>,
+the <code>price_value</code> (field 9) is treated as list price - When
+<code>price_type</code> (field 7) is <code>2</code>, the
+<code>price_value</code> (field 9) is treated as purchase price</p>
+<hr />
+<h2 id="question-2-record-type-z-graduated-price">Question 2: Record
+type Z (Graduated price)</h2>
+<p><strong>Question:</strong> Is the price/percentage in field 8 the
+list price or the purchase price?</p>
+<p><strong>Answer:</strong> Field 8 is the <strong>value type</strong>,
+not the price itself. The actual price/percentage is in field 12
+(Value). The base (list price or purchase price) is determined by
+<strong>field 10</strong> (Price base): - If field 10 = 1 → the
+price/percentage in field 12 refers to <strong>list price</strong> - If
+field 10 = 2 → the price/percentage in field 12 refers to
+<strong>purchase price</strong></p>
+<p>Field meanings: - <strong>Field 8</strong> = Value type: -
+<code>1</code> = Graduated price - <code>2</code> = Surcharge/discount
+absolute amount - <code>3</code> = Percentage surcharge/discount -
+<strong>Field 10</strong> = Price base: - <code>1</code> = List price -
+<code>2</code> = Purchase price - <strong>Field 12</strong> = Value
+(price/amount/percentage according to field 8)</p>
+<p>So the base is determined by field 10, not field 8.</p>

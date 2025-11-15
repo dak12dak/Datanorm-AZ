@@ -1,0 +1,56 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="antworten-auf-fragen">Antworten auf Fragen</h1>
+<h2 id="frage-1-datensatztyp-a-artikel">Frage 1: Datensatztyp A
+(Artikel)</h2>
+<p><strong>Frage:</strong> Ist der Preis in Feld 9 der Listenpreis oder
+der Einkaufspreis?</p>
+<p><strong>Antwort:</strong> Es hängt von Feld 7 (Preistyp-Code) ab: -
+Wenn Feld 7 = 1 oder 9 → Feld 9 enthält den <strong>Listenpreis</strong>
+- Wenn Feld 7 = 2 → Feld 9 enthält den
+<strong>Einkaufspreis</strong></p>
+<p>Feld 7 Werte: - <code>1</code> = Listenpreis (прейскурантная) -
+<code>2</code> = Einkaufspreis (закупочная) - <code>9</code> =
+Alternativer Preis (альтернативная)</p>
+<p><strong>Hinweis:</strong> Da die Spezifikation nicht klar definiert,
+was “alternativer Preis” (Wert 9) bedeutet, behandeln wir ihn in unserer
+Implementierung als <strong>Listenpreis</strong>.</p>
+<p>Die Interpretation ist im Code wie folgt implementiert: - Wenn
+<code>price_type</code> (Feld 7) <code>1</code> oder <code>9</code> ist,
+wird <code>price_value</code> (Feld 9) als Listenpreis behandelt - Wenn
+<code>price_type</code> (Feld 7) <code>2</code> ist, wird
+<code>price_value</code> (Feld 9) als Einkaufspreis behandelt</p>
+<hr />
+<h2 id="frage-2-datensatztyp-z-staffelpreis">Frage 2: Datensatztyp Z
+(Staffelpreis)</h2>
+<p><strong>Frage:</strong> Bezieht sich der Preis/Prozentsatz in Feld 8
+auf den Listenpreis oder den Einkaufspreis?</p>
+<p><strong>Antwort:</strong> Feld 8 ist der <strong>Werttyp</strong>,
+nicht der Preis selbst. Der tatsächliche Preis/Prozentsatz befindet sich
+in Feld 12 (Wert). Die Basis (Listenpreis oder Einkaufspreis) wird durch
+<strong>Feld 10</strong> (Preisbasis) bestimmt: - Wenn Feld 10 = 1 →
+bezieht sich der Preis/Prozentsatz in Feld 12 auf den
+<strong>Listenpreis</strong> - Wenn Feld 10 = 2 → bezieht sich der
+Preis/Prozentsatz in Feld 12 auf den <strong>Einkaufspreis</strong></p>
+<p>Feldbedeutungen: - <strong>Feld 8</strong> = Werttyp: -
+<code>1</code> = Staffelpreis - <code>2</code> = Zuschlag/Rabatt
+absoluter Betrag - <code>3</code> = Prozentsatz Zuschlag/Rabatt -
+<strong>Feld 10</strong> = Preisbasis: - <code>1</code> = Listenpreis -
+<code>2</code> = Einkaufspreis - <strong>Feld 12</strong> = Wert
+(Preis/Betrag/Prozentsatz gemäß Feld 8)</p>
+<p>Die Basis wird also durch Feld 10 bestimmt, nicht durch Feld 8.</p>

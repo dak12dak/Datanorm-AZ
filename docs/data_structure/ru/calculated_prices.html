@@ -1,0 +1,177 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+pre, code {
+  white-space: pre-wrap;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="структура-рассчитанных-цен-выходные-данные">Структура
+рассчитанных цен (выходные данные)</h1>
+<p>Этот документ описывает структуру выходных данных, возвращаемых
+методом <code>calculate_prices()</code> и экспортируемых методом
+<code>export_prices_to_csv()</code>.</p>
+<p>Каждая строка представляет собой словарь со следующими полями (все
+цены за единицу товара):</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 35%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr>
+<th>Столбец</th>
+<th>Назначение</th>
+<th>Тип данных</th>
+<th>Источник</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>article_no</td>
+<td>Номер артикула</td>
+<td>TEXT</td>
+<td>Поле 3 записи A</td>
+<td>2TOP</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Название артикула</td>
+<td>TEXT</td>
+<td>Поле 4 записи A</td>
+<td>OMEGA UDOs…</td>
+</tr>
+<tr>
+<td>unit</td>
+<td>Единица измерения</td>
+<td>TEXT</td>
+<td>Поле 6 записи A</td>
+<td>MTK</td>
+</tr>
+<tr>
+<td>list_price</td>
+<td>Прейскурантная цена</td>
+<td>REAL</td>
+<td>Цена по типу 1/9 или ступеням с base=1</td>
+<td>894.0</td>
+</tr>
+<tr>
+<td>supplier_discount_pct</td>
+<td>Скидка поставщика, %</td>
+<td>REAL</td>
+<td>Вычисление</td>
+<td>29.87</td>
+</tr>
+<tr>
+<td>purchase_price</td>
+<td>Закупочная цена</td>
+<td>REAL</td>
+<td>Цена по типу 2 или ступеням с base=2</td>
+<td>626.0</td>
+</tr>
+<tr>
+<td>overhead_pct</td>
+<td>Накладные расходы, %</td>
+<td>REAL</td>
+<td>Параметр запуска</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>calculated_purchase_price</td>
+<td>Расчётная закупочная цена</td>
+<td>REAL</td>
+<td>purchase_price × (1 + overhead/100)</td>
+<td>626.0</td>
+</tr>
+<tr>
+<td>markup_pct</td>
+<td>Наценка, %</td>
+<td>REAL</td>
+<td>Вычисление</td>
+<td>42.59</td>
+</tr>
+<tr>
+<td>sale_price</td>
+<td>Продажная цена</td>
+<td>REAL</td>
+<td>list_price или calculated_purchase</td>
+<td>894.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Дополнительные поля при указании количества:</strong></p>
+<p>Когда параметр <code>quantity</code> передаётся в
+<code>calculate_prices()</code> или <code>export_prices_to_csv()</code>,
+включаются следующие дополнительные поля:</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 35%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr>
+<th>Столбец</th>
+<th>Назначение</th>
+<th>Тип данных</th>
+<th>Источник</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>quantity</td>
+<td>Указанное количество для расчёта цен</td>
+<td>REAL</td>
+<td>Параметр запуска</td>
+<td>200.0</td>
+</tr>
+<tr>
+<td>total_list_price</td>
+<td>Общая прейскурантная цена (list_price × quantity)</td>
+<td>REAL</td>
+<td>Вычисление</td>
+<td>178800.0</td>
+</tr>
+<tr>
+<td>total_purchase_price</td>
+<td>Общая закупочная цена (purchase_price × quantity)</td>
+<td>REAL</td>
+<td>Вычисление</td>
+<td>125200.0</td>
+</tr>
+<tr>
+<td>total_calculated_purchase_price</td>
+<td>Общая расчётная закупочная цена (calculated_purchase_price ×
+quantity)</td>
+<td>REAL</td>
+<td>Вычисление</td>
+<td>125200.0</td>
+</tr>
+<tr>
+<td>total_sale_price</td>
+<td>Общая продажная цена (sale_price × quantity)</td>
+<td>REAL</td>
+<td>Вычисление</td>
+<td>178800.0</td>
+</tr>
+</tbody>
+</table>

@@ -1,0 +1,177 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+pre, code {
+  white-space: pre-wrap;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="struktur-der-berechneten-preise-ausgabe">Struktur der
+berechneten Preise (Ausgabe)</h1>
+<p>Dieses Dokument beschreibt die Struktur der Ausgabe, die von der
+Methode <code>calculate_prices()</code> zurückgegeben und von
+<code>export_prices_to_csv()</code> exportiert wird.</p>
+<p>Jede Zeile stellt ein Wörterbuch mit den folgenden Feldern dar (alle
+Preise sind Stückpreise):</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 29%" />
+<col style="width: 7%" />
+<col style="width: 33%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr>
+<th>Spalte</th>
+<th>Beschreibung</th>
+<th>Datentyp</th>
+<th>Quelle</th>
+<th>Beispiel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>article_no</td>
+<td>Artikelnummer</td>
+<td>TEXT</td>
+<td>Feld 3 aus Datensatz A</td>
+<td>2TOP</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Artikelbezeichnung</td>
+<td>TEXT</td>
+<td>Feld 4 aus Datensatz A</td>
+<td>OMEGA UDOs…</td>
+</tr>
+<tr>
+<td>unit</td>
+<td>Mengeneinheit</td>
+<td>TEXT</td>
+<td>Feld 6 aus Datensatz A</td>
+<td>MTK</td>
+</tr>
+<tr>
+<td>list_price</td>
+<td>Listenpreis</td>
+<td>REAL</td>
+<td>Preis aus Typ 1/9 oder Staffel base=1</td>
+<td>894.0</td>
+</tr>
+<tr>
+<td>supplier_discount_pct</td>
+<td>Lieferantenrabatt, %</td>
+<td>REAL</td>
+<td>Berechnung</td>
+<td>29.87</td>
+</tr>
+<tr>
+<td>purchase_price</td>
+<td>Einkaufspreis</td>
+<td>REAL</td>
+<td>Preis aus Typ 2 oder Staffel base=2</td>
+<td>626.0</td>
+</tr>
+<tr>
+<td>overhead_pct</td>
+<td>Gemeinkosten, %</td>
+<td>REAL</td>
+<td>Laufzeitparameter</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>calculated_purchase_price</td>
+<td>Berechneter Einkaufspreis</td>
+<td>REAL</td>
+<td>purchase_price × (1 + overhead/100)</td>
+<td>626.0</td>
+</tr>
+<tr>
+<td>markup_pct</td>
+<td>Aufschlag, %</td>
+<td>REAL</td>
+<td>Berechnung</td>
+<td>42.59</td>
+</tr>
+<tr>
+<td>sale_price</td>
+<td>Verkaufspreis</td>
+<td>REAL</td>
+<td>list_price oder calculated_purchase</td>
+<td>894.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Zusätzliche Felder bei Angabe der Menge:</strong></p>
+<p>Wenn der Parameter <code>quantity</code> an
+<code>calculate_prices()</code> oder <code>export_prices_to_csv()</code>
+übergeben wird, werden die folgenden zusätzlichen Felder einbezogen:</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 29%" />
+<col style="width: 7%" />
+<col style="width: 33%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr>
+<th>Spalte</th>
+<th>Beschreibung</th>
+<th>Datentyp</th>
+<th>Quelle</th>
+<th>Beispiel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>quantity</td>
+<td>Angegebene Menge für Preisberechnung</td>
+<td>REAL</td>
+<td>Laufzeitparameter</td>
+<td>200.0</td>
+</tr>
+<tr>
+<td>total_list_price</td>
+<td>Gesamtlistenpreis (list_price × quantity)</td>
+<td>REAL</td>
+<td>Berechnung</td>
+<td>178800.0</td>
+</tr>
+<tr>
+<td>total_purchase_price</td>
+<td>Gesamteinkaufspreis (purchase_price × quantity)</td>
+<td>REAL</td>
+<td>Berechnung</td>
+<td>125200.0</td>
+</tr>
+<tr>
+<td>total_calculated_purchase_price</td>
+<td>Gesamtberechneter Einkaufspreis (calculated_purchase_price ×
+quantity)</td>
+<td>REAL</td>
+<td>Berechnung</td>
+<td>125200.0</td>
+</tr>
+<tr>
+<td>total_sale_price</td>
+<td>Gesamtverkaufspreis (sale_price × quantity)</td>
+<td>REAL</td>
+<td>Berechnung</td>
+<td>178800.0</td>
+</tr>
+</tbody>
+</table>

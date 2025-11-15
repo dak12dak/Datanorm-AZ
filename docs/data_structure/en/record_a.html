@@ -1,0 +1,176 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 17%" />
+<col style="width: 30%" />
+<col style="width: 16%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field No.</th>
+<th>Name</th>
+<th>Meaning/Function</th>
+<th>Example</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Record type</td>
+<td>Record identifier (<code>A</code> stands for Article)</td>
+<td><code>A</code></td>
+<td>Always <code>A</code> for article data</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Record status</td>
+<td>Action/Status of the entry</td>
+<td><code>N</code></td>
+<td>In example <code>N</code> (likely “new”)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Article number</td>
+<td>Unique article identifier</td>
+<td><code>2TOP</code></td>
+<td>Reference for searching and graduated prices</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Article description</td>
+<td>Main description</td>
+<td><code>OMEGA UDOs 330 TopGrip…</code></td>
+<td>Up to 40 characters</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Additional description</td>
+<td>Details such as dimensions or packaging</td>
+<td><code>1,5m x 30 m</code></td>
+<td>May be empty</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Unit of measure</td>
+<td>Unit code</td>
+<td><code>MTK</code></td>
+<td>Example: MTK = square meters cardboard</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Price type code</td>
+<td>1 = List price, 2 = Purchase price, 9 = alternative base</td>
+<td><code>2</code></td>
+<td>Works together with field 9</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Price indicator</td>
+<td>Technical code (in example <code>1</code>)</td>
+<td><code>1</code></td>
+<td>To be verified according to specification</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Price</td>
+<td>Value in file currency</td>
+<td><code>894</code></td>
+<td>Interpretation depends on field 7</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Product group</td>
+<td>Category/class</td>
+<td><code>001</code></td>
+<td>Useful for clustering</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Short group</td>
+<td>Product family abbreviation</td>
+<td><code>Dac</code></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Long group</td>
+<td>Full product family name</td>
+<td><code>Dachbahnen</code></td>
+<td></td>
+</tr>
+<tr>
+<td>13-18</td>
+<td>Reserved fields</td>
+<td>Empty in example</td>
+<td></td>
+<td>May be used by supplier</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Barcode/EAN</td>
+<td>Barcode identifier</td>
+<td><code>9120090200379</code></td>
+<td>Optional</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Additional code</td>
+<td>Empty in example</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>21</td>
+<td>VAT</td>
+<td>Tax rate (in percent × 100)</td>
+<td><code>0</code></td>
+<td><code>0</code> = none or already included</td>
+</tr>
+<tr>
+<td>22</td>
+<td>VAT code</td>
+<td>Empty in example</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>23</td>
+<td>Supplier discount, %</td>
+<td>Discount value (if set)</td>
+<td><code>0</code></td>
+<td>Refers to list price</td>
+</tr>
+<tr>
+<td>24-30</td>
+<td>Reserved/empty</td>
+<td>Not used</td>
+<td></td>
+<td>Usage depends on implementation</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Note: The mapping is based on the example <code>DATANORM.001</code>
+and task specifications. Fields with open clarification needs should be
+verified against the official DATANORM documentation from the
+supplier.</p>
+</blockquote>

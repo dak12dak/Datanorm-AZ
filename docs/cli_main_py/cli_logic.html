@@ -1,0 +1,259 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="cli-logic-documentation">CLI Logic Documentation</h1>
+<p>This document describes the behavior of <code>main.py</code> based on
+command-line arguments.</p>
+<h2 id="decision-flowchart">Decision Flowchart</h2>
+<p><img src="cli_logic_chart.svg" alt="Flowchart diagram" style="max-width: 100%; height: auto;" /></p>
+<h2 id="detailed-behavior">Detailed Behavior</h2>
+<h3 id="export-mode---export-specified">Export Mode
+(<code>--export</code> specified)</h3>
+<ol type="1">
+<li><strong>If <code>--article</code> is specified:</strong>
+<ul>
+<li>Export only the specified article</li>
+<li><code>export_prices_to_csv(..., article_no=args.article, overhead_percent=args.overhead, quantity=args.quantity)</code></li>
+<li>CSV is created even if article is not found (empty CSV with
+headers)</li>
+</ul></li>
+<li><strong>Else if <code>--prices</code> is specified:</strong>
+<ul>
+<li>Export only the specified article (same as
+<code>--article</code>)</li>
+<li><code>export_prices_to_csv(..., article_no=args.prices, overhead_percent=args.overhead, quantity=args.quantity)</code></li>
+<li>CSV is created even if article is not found (empty CSV with
+headers)</li>
+</ul></li>
+<li><strong>Else (if <code>--limit</code> is specified or not):</strong>
+<ul>
+<li>Export with limit</li>
+<li><code>export_prices_to_csv(..., limit=args.limit, overhead_percent=args.overhead, quantity=args.quantity)</code></li>
+<li>If <code>--limit</code> is not specified, default
+<code>limit=1</code> (first article only)</li>
+<li>Use <code>--limit all</code> or <code>--limit None</code> for
+unlimited export</li>
+</ul></li>
+</ol>
+<h3 id="article-lookup-mode---article-specified-no---export">Article
+Lookup Mode (<code>--article</code> specified, no
+<code>--export</code>)</h3>
+<ul>
+<li>Lookup raw article data (no price calculations)</li>
+<li>Options <code>--overhead</code> and <code>--qnt</code> are not used
+(no price calculations)</li>
+<li>If article not found → <code>SystemExit</code> with error
+message</li>
+<li>If found → Print JSON with article data</li>
+</ul>
+<h3 id="prices-lookup-mode---prices-specified-no---export">Prices Lookup
+Mode (<code>--prices</code> specified, no <code>--export</code>)</h3>
+<ul>
+<li>Calculate prices for specific article</li>
+<li>Uses <code>--overhead</code> and <code>--qnt</code> options for
+price calculations</li>
+<li>If article not found → <code>SystemExit</code> with error
+message</li>
+<li>If found → Print JSON with calculated prices array</li>
+</ul>
+<h3
+id="default-mode---limit-not-specified-or---limit-1-no-other-flags">Default
+Mode (<code>--limit</code> not specified or <code>--limit == 1</code>,
+no other flags)</h3>
+<ul>
+<li>Get first article from database</li>
+<li>Uses <code>--overhead</code> and <code>--qnt</code> options for
+price calculations</li>
+<li>If no articles → Print <code>[]</code></li>
+<li>If found → Print JSON with:
+<ul>
+<li><code>article</code>: raw article data</li>
+<li><code>prices</code>: first element from calculated prices (or
+<code>None</code>)</li>
+</ul></li>
+</ul>
+<h3 id="list-mode---limit-specified-and-1-no-other-flags">List Mode
+(<code>--limit</code> specified and <code>!= 1</code>, no other
+flags)</h3>
+<ul>
+<li>Calculate prices for multiple articles</li>
+<li>Uses <code>--overhead</code> and <code>--qnt</code> options for
+price calculations</li>
+<li>Print JSON array with calculated prices</li>
+<li>Number of articles = <code>args.limit</code> (or unlimited if
+<code>--limit all</code> or <code>--limit None</code>)</li>
+</ul>
+<h2 id="common-options">Common Options</h2>
+<ul>
+<li><code>--overhead &lt;float&gt;</code>: Overhead percentage (default:
+0.0)
+<ul>
+<li>Applied to all price calculations (Export, Prices Lookup, Default,
+List modes)</li>
+<li>Not used in Article Lookup mode (no price calculations)</li>
+</ul></li>
+<li><code>--qnt &lt;float&gt;</code>: Quantity for price calculation
+(default: 1.0 if not specified)
+<ul>
+<li>Uses graduated prices if available</li>
+<li>Applied to all price calculations (Export, Prices Lookup, Default,
+List modes)</li>
+<li>Not used in Article Lookup mode (no price calculations)</li>
+</ul></li>
+<li><code>--limit &lt;int|all|None&gt;</code>: Limit number of articles
+(default: 1)
+<ul>
+<li>Used in Export mode and List mode</li>
+<li>In Default mode, <code>--limit</code> is not specified or equals
+1</li>
+</ul></li>
+</ul>
+<h2 id="examples">Examples</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export first article</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Export all articles</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--limit</span> all</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Export specific article</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--article</span> 2TOP</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Lookup raw article data</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--article</span> 2TOP</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate prices for specific article</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--prices</span> 2TOP <span class="at">--qnt</span> 100</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: first article with prices</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># List first 10 articles with prices</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> 10</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># List all articles with prices</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> all</span></code></pre></div>
+<h2 id="edge-cases-and-error-handling">Edge Cases and Error
+Handling</h2>
+<h3 id="article-not-found">Article Not Found</h3>
+<p><strong>Behavior differs by mode:</strong></p>
+<ol type="1">
+<li><p><strong>Article Lookup Mode
+(<code>--article</code>):</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--article</span> NONEXISTENT</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: SystemExit with error message</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Error: &quot;Article NONEXISTENT not found&quot;</span></span></code></pre></div></li>
+<li><p><strong>Prices Lookup Mode (<code>--prices</code>):</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--prices</span> NONEXISTENT</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: SystemExit with error message</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Error: &quot;Article NONEXISTENT not found&quot;</span></span></code></pre></div></li>
+<li><p><strong>Export Mode (<code>--export</code>):</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--article</span> NONEXISTENT</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: CSV file is created with headers only (no data rows)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Message: &quot;Exported results to output.csv&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># No error is raised - export succeeds with empty result</span></span></code></pre></div></li>
+</ol>
+<h3 id="empty-database">Empty Database</h3>
+<p><strong>When no articles exist in the database:</strong></p>
+<ol type="1">
+<li><p><strong>Default Mode:</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: []</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (Empty JSON array)</span></span></code></pre></div></li>
+<li><p><strong>List Mode:</strong></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> 10</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: []</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (Empty JSON array)</span></span></code></pre></div></li>
+<li><p><strong>Export Mode:</strong></p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: CSV file created with headers only</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Message: &quot;Exported results to output.csv&quot;</span></span></code></pre></div></li>
+<li><p><strong>Article/Prices Lookup:</strong></p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--article</span> ANY</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: SystemExit with error</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Error: &quot;Article ANY not found&quot;</span></span></code></pre></div></li>
+</ol>
+<h3 id="combining-options">Combining Options</h3>
+<p><strong>Valid combinations:</strong></p>
+<ul>
+<li><code>--export --article --overhead --qnt</code>: Export specific
+article with overhead and quantity</li>
+<li><code>--prices --overhead --qnt</code>: Calculate prices with
+overhead and quantity</li>
+<li><code>--limit --overhead --qnt</code>: List multiple articles with
+overhead and quantity</li>
+</ul>
+<p><strong>Options that don’t apply:</strong></p>
+<ul>
+<li><code>--article</code> mode: <code>--overhead</code> and
+<code>--qnt</code> are ignored (no price calculations)</li>
+<li><code>--export --article</code> and <code>--export --prices</code>:
+Both work the same way (export specific article)</li>
+</ul>
+<p><strong>Example of combining options:</strong></p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export specific article with overhead 10% and quantity 100</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--article</span> 2TOP <span class="at">--overhead</span> 10.0 <span class="at">--qnt</span> 100</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate prices for article with overhead 5% and quantity 50</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--prices</span> 2TOP <span class="at">--overhead</span> 5.0 <span class="at">--qnt</span> 50</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># List first 5 articles with overhead 15% and quantity 200</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> 5 <span class="at">--overhead</span> 15.0 <span class="at">--qnt</span> 200</span></code></pre></div>
+<h3 id="limit-parameter-edge-cases">Limit Parameter Edge Cases</h3>
+<p><strong>Special limit values:</strong></p>
+<ul>
+<li><code>--limit 1</code> or no <code>--limit</code>: Default mode
+(first article with both article info and prices)</li>
+<li><code>--limit 0</code>: Returns empty array <code>[]</code></li>
+<li><code>--limit all</code> or <code>--limit None</code>: Unlimited
+(all articles)</li>
+<li><code>--limit 10</code>: List mode (first 10 articles with
+calculated prices only)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> 0</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: []</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--limit</span> all</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: [array of all articles with calculated prices]</span></span></code></pre></div>
+<h3 id="export-mode-behavior">Export Mode Behavior</h3>
+<p><strong>Export always succeeds, even with no data:</strong></p>
+<ul>
+<li>If article not found → CSV with headers only</li>
+<li>If database is empty → CSV with headers only</li>
+<li>If limit is 0 → CSV with headers only</li>
+<li>Output folder is created automatically if it doesn’t exist</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export non-existent article</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--article</span> NONEXISTENT</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates: output.csv with headers, no data rows</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># No error raised</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Export with limit 0</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> main.py <span class="at">--export</span> output.csv <span class="at">--limit</span> 0</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates: output.csv with headers, no data rows</span></span></code></pre></div>

@@ -1,0 +1,177 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+pre, code {
+  white-space: pre-wrap;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="calculated-prices-output-structure">Calculated Prices Output
+Structure</h1>
+<p>This document describes the structure of the output returned by
+<code>calculate_prices()</code> method and exported by
+<code>export_prices_to_csv()</code>.</p>
+<p>Each row represents a dictionary with the following fields (all
+prices are unit prices):</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 29%" />
+<col style="width: 7%" />
+<col style="width: 33%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+<th>Data Type</th>
+<th>Source</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>article_no</td>
+<td>Article number</td>
+<td>TEXT</td>
+<td>Field 3 from record A</td>
+<td>2TOP</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Article description</td>
+<td>TEXT</td>
+<td>Field 4 from record A</td>
+<td>OMEGA UDOs…</td>
+</tr>
+<tr>
+<td>unit</td>
+<td>Unit of measure</td>
+<td>TEXT</td>
+<td>Field 6 from record A</td>
+<td>MTK</td>
+</tr>
+<tr>
+<td>list_price</td>
+<td>List price</td>
+<td>REAL</td>
+<td>Price from type 1/9 or step base=1</td>
+<td>894.0</td>
+</tr>
+<tr>
+<td>supplier_discount_pct</td>
+<td>Supplier discount, %</td>
+<td>REAL</td>
+<td>Calculation</td>
+<td>29.87</td>
+</tr>
+<tr>
+<td>purchase_price</td>
+<td>Purchase price</td>
+<td>REAL</td>
+<td>Price from type 2 or step base=2</td>
+<td>626.0</td>
+</tr>
+<tr>
+<td>overhead_pct</td>
+<td>Overhead, %</td>
+<td>REAL</td>
+<td>Runtime parameter</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>calculated_purchase_price</td>
+<td>Calculated purchase price</td>
+<td>REAL</td>
+<td>purchase_price × (1 + overhead/100)</td>
+<td>626.0</td>
+</tr>
+<tr>
+<td>markup_pct</td>
+<td>Markup, %</td>
+<td>REAL</td>
+<td>Calculation</td>
+<td>42.59</td>
+</tr>
+<tr>
+<td>sale_price</td>
+<td>Sale price</td>
+<td>REAL</td>
+<td>list_price or calculated_purchase</td>
+<td>894.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Additional fields when quantity is specified:</strong></p>
+<p>When <code>quantity</code> parameter is provided to
+<code>calculate_prices()</code> or <code>export_prices_to_csv()</code>,
+the following additional fields are included:</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 29%" />
+<col style="width: 7%" />
+<col style="width: 33%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+<th>Data Type</th>
+<th>Source</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>quantity</td>
+<td>Specified quantity for price calculation</td>
+<td>REAL</td>
+<td>Runtime parameter</td>
+<td>200.0</td>
+</tr>
+<tr>
+<td>total_list_price</td>
+<td>Total list price (list_price × quantity)</td>
+<td>REAL</td>
+<td>Calculation</td>
+<td>178800.0</td>
+</tr>
+<tr>
+<td>total_purchase_price</td>
+<td>Total purchase price (purchase_price × quantity)</td>
+<td>REAL</td>
+<td>Calculation</td>
+<td>125200.0</td>
+</tr>
+<tr>
+<td>total_calculated_purchase_price</td>
+<td>Total calculated purchase price (calculated_purchase_price ×
+quantity)</td>
+<td>REAL</td>
+<td>Calculation</td>
+<td>125200.0</td>
+</tr>
+<tr>
+<td>total_sale_price</td>
+<td>Total sale price (sale_price × quantity)</td>
+<td>REAL</td>
+<td>Calculation</td>
+<td>178800.0</td>
+</tr>
+</tbody>
+</table>

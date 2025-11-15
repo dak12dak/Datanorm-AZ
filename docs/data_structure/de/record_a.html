@@ -1,0 +1,176 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 17%" />
+<col style="width: 30%" />
+<col style="width: 16%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feld-Nr.</th>
+<th>Bezeichnung</th>
+<th>Bedeutung/Funktion</th>
+<th>Beispiel</th>
+<th>Hinweis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Satztyp</td>
+<td>Kennzeichen des Datensatzes (<code>A</code> steht für Artikel)</td>
+<td><code>A</code></td>
+<td>Immer <code>A</code> für Artikeldaten</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Satzstatus</td>
+<td>Aktion/Status des Eintrags</td>
+<td><code>N</code></td>
+<td>Im Beispiel <code>N</code> (vermutlich „neu“)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Artikelnummer</td>
+<td>Eindeutige Kennung des Artikels</td>
+<td><code>2TOP</code></td>
+<td>Referenz für Suchen und Staffelpreise</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Artikelbezeichnung</td>
+<td>Hauptbezeichnung</td>
+<td><code>OMEGA UDOs 330 TopGrip…</code></td>
+<td>Bis zu 40 Zeichen</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Zusatzbeschreibung</td>
+<td>Details wie Maße oder Verpackung</td>
+<td><code>1,5m x 30 m</code></td>
+<td>Kann leer sein</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Mengeneinheit</td>
+<td>Code der Mengeneinheit</td>
+<td><code>MTK</code></td>
+<td>Beispiel: MTK = Quadratmeter Karton</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Preisart-Code</td>
+<td>1 = Listenpreis, 2 = Einkaufspreis, 9 = alternative Basis</td>
+<td><code>2</code></td>
+<td>Zusammenspiel mit Feld 9</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Preis-Indikator</td>
+<td>Technischer Code (im Beispiel <code>1</code>)</td>
+<td><code>1</code></td>
+<td>Laut Spezifikation zu prüfen</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Preis</td>
+<td>Wert in der Währung der Datei</td>
+<td><code>894</code></td>
+<td>Interpretation abhängig von Feld 7</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Warengruppe</td>
+<td>Kategorie/Klasse</td>
+<td><code>001</code></td>
+<td>Nützlich für Clustering</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Kurzgruppe</td>
+<td>Kürzel der Produktfamilie</td>
+<td><code>Dac</code></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Langgruppe</td>
+<td>Vollständiger Name der Produktfamilie</td>
+<td><code>Dachbahnen</code></td>
+<td></td>
+</tr>
+<tr>
+<td>13-18</td>
+<td>Reservierte Felder</td>
+<td>Im Beispiel leer</td>
+<td></td>
+<td>Können vom Lieferanten verwendet werden</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Strichcode/EAN</td>
+<td>Barcode-Kennung</td>
+<td><code>9120090200379</code></td>
+<td>Optional</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Zusatzcode</td>
+<td>Im Beispiel leer</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>21</td>
+<td>Mehrwertsteuer</td>
+<td>Steuersatz (in Prozent × 100)</td>
+<td><code>0</code></td>
+<td><code>0</code> = kein bzw. bereits enthalten</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Mehrwertsteuer-Code</td>
+<td>Im Beispiel leer</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>23</td>
+<td>Lieferantenrabatt, %</td>
+<td>Rabattwert (falls gesetzt)</td>
+<td><code>0</code></td>
+<td>Bezieht sich auf den Listenpreis</td>
+</tr>
+<tr>
+<td>24-30</td>
+<td>Reserviert/leer</td>
+<td>Nicht belegt</td>
+<td></td>
+<td>Nutzung abhängig von der Implementierung</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Hinweis: Die Zuordnung basiert auf dem Beispiel
+<code>DATANORM.001</code> sowie den Aufgabenangaben. Felder mit offenem
+Klärungsbedarf sollten gegen die offizielle DATANORM-Dokumentation des
+Lieferanten geprüft werden.</p>
+</blockquote>

@@ -1,0 +1,58 @@
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  vertical-align: top;
+  border: 1px solid #ccc;
+}
+thead th {
+  background-color: #f5f5f5;
+}
+/* For PDF export: `pandoc <input.md> -o <output.pdf> --pdf-engine=xelatex -V mainfont="Arial"` */
+</style>
+
+<h1 id="task-description-german">Task Description (German)</h1>
+<h2 id="einlesen-der-folgenden-textdatei">Einlesen der folgenden
+Textdatei:</h2>
+<ul>
+<li><strong>Vorgaben</strong>: Textdatei könnte bis zu 2 Millionen
+Zeilen enthalten
+<ul>
+<li>Einlesen in fiktive Datenbank</li>
+<li>Berechnung Verkaufspreis</li>
+<li>Prüfen ob Artikel bereits vorhanden ist über Artikelnummer</li>
+</ul></li>
+</ul>
+<h3 id="satzart-a-artikel">Satzart A (Artikel)</h3>
+<ul>
+<li><strong>Feld 3</strong> = Artikelnummer</li>
+<li><strong>Feld 4</strong> = Artikelbezeichnung</li>
+<li><strong>Feld 7</strong> = 1 = Wert Listenpreis, 2 = Einkaufspreis, 9
+= Listenpreis
+<ul>
+<li>⚠ Ist der Preis in Feld 9 der Listenpreis oder der
+Einkaufspreis?</li>
+</ul></li>
+<li><strong>Feld 9</strong> = Preis</li>
+</ul>
+<h3 id="satzart-z-staffelpreis">Satzart Z (Staffelpreis)</h3>
+<ul>
+<li><strong>Feld 3</strong> = Artikelnummer</li>
+<li><strong>Feld 8</strong> = 1 = Staffelpreis, 2 = Zu/Abschlag Betrag,
+3 = prozentueller Zu/Abschlag</li>
+<li><strong>Feld 9</strong> = + = Zuschlag, - = Abschlag</li>
+<li><strong>Feld 10</strong> = 1 = Listenpreis, 2 = Einkaufspreis
+<ul>
+<li>⚠ Ist der Preis/Prozentsatz in Feld 8 der Listenpreis oder der
+Einkaufspreis?</li>
+</ul></li>
+</ul>
+<h3 id="aufbau-artikel-tabelle">Aufbau Artikel-Tabelle</h3>
+<p><strong>Spalten:</strong> - Artikelnummer - Artikelbezeichnung -
+Listenpreis - Lieferantenrabatt (Prozent) - Einkaufspreis - Gemeinkosten
+(Prozent) - Kalk. Einkaufspreis - Aufschlag (Prozent) -
+Verkaufspreis</p>

@@ -1,0 +1,8 @@
+# Development files
+dev/
+
+# Output files
+output/
+
+# Python cache
+**/__pycache__/
